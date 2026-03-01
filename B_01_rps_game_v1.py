@@ -81,31 +81,34 @@ def rps_compare(user, comp):
 
     # If user and computer choice are the same, it is a tie
     if user == comp:
-        result = "tie"
+        round_result = "tie"
 
     # There are three ways to win
     elif user == "paper" and comp == "rock":
-        result = "win"
+        round_result = "win"
     elif user == "scissors" and comp == "paper":
-        result = "win"
+        round_result = "win"
     elif user == "rock" and comp == "scissors":
-        result = "win"
+        round_result = "win"
 
     # If it's not a win / tie, then it's a loss
     else:
-        result = "lose"
+        round_result = "lose"
 
-    return result
+    return round_result
 
 
 # Main Routine Starts here
 
 # Initialise game variables
 mode = "regular"
+
 rounds_played = 0
+rounds_tied = 0
+rounds_lost = 0
 
 rps_list= ["rock", "paper", "scissors", "xxx"]
-
+game_history = [ ]
 
 print("💎📄✂ Rock / Paper / Scissors Game ✂📄💎")
 print()
@@ -149,11 +152,28 @@ while rounds_played < num_rounds:
     if user_choice == "xxx":
         break
 
-    # randomly choose from the rps list (excluding the exit code)
-    comp_choice = random.choice(rps_list[:-1])
-
     result = rps_compare(user_choice, comp_choice)
-    print(f"{user_choice} vs {comp_choice}, {result}")
+
+    # Adjust game lost / game tied counters and add results to game history
+    if result == "tie":
+        rounds_tied += 1
+        feedback = "-🪢🪢 It's a tie 🪢🪢"
+
+    elif result == "lose":
+        rounds_lost += 1
+        feedback = "❌❌ You lose ❌❌"
+
+    else:
+        feedback = "🎉🎉 You won 🎉🎉"
+
+
+    # Set up round feedback and output it
+    # Add it to the game history list (include the round number)
+    round_feedback =  f" {user_choice} vs {comp_choice}, {feedback}"
+    history_item = f"Round: {rounds_played} - {round_feedback}"
+
+    print(round_feedback)
+    game_history.append(history_item)
 
     rounds_played += 1
 
@@ -164,4 +184,28 @@ while rounds_played < num_rounds:
 
 # Game loop ends here
 
-# Game History / statistics area
+# Calculate statistics
+if rounds_played > 0:
+    rounds_won = rounds_played - rounds_tied - rounds_lost
+    percent_won = rounds_won / rounds_played * 100
+    percent_lost = rounds_lost / rounds_played * 100
+    percent_tied = 100 - percent_won - percent_lost
+
+    # Output game stats
+    print(" Game Statistics ")
+    print(f" Won: {percent_won: .2f} \t "
+          f" Lost: {percent_lost: .2f} \t "
+          f" Tied: {percent_tied: .2f} \t")
+
+    # ask user if they would like to see game history and output if requested
+    see_history = string_checker("\nDo you want to see the game history?")
+    if see_history == "yes":
+        for item in game_history:
+            print(item)
+
+    print()
+    print("Thank you for playing")
+
+else:
+    print("🐔🐔 oh no - you chickened out! 🐔🐔")
+
